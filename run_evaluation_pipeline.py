@@ -9,9 +9,16 @@ from evaluationPipeline.evaluation_mrr import calculate_mrr
 from evaluationPipeline.ablation_study import run_ablation
 from evaluationPipeline.generate_plots import generate_visualizations
 from evaluationPipeline.generate_report import generate_report
+from evaluationPipeline.QA_generation import generate_qa_dataset
 
 def main():
     print("Starting HybridRAG Automated Evaluation Pipeline...")
+    
+    # 0. Generate QA Dataset
+    print(f"\n{'='*50}")
+    print("STEP: Generating QA Dataset (Synthetic Data)")
+    print(f"{'='*50}\n")
+    generate_qa_dataset()
     
     # 1. Calculate Metrics (Semantic, BLEU, Judge, Latency, Confidence)
     print(f"\n{'='*50}")

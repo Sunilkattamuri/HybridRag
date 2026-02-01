@@ -9,7 +9,7 @@ USER_AGENT = "BIT-User-Agent/1.0 (academic research;)"
 # Model Configuration
 EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
 TOKENIZER_MODEL = "bert-base-uncased"
-LLM_RAG_MODEL_NAME = "google/flan-t5-large"
+LLM_RAG_MODEL_NAME = "google/flan-t5-base"
 
 
 # Text Chunking Configuration

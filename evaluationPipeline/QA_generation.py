@@ -37,10 +37,10 @@ def init_llm():
 def generate_question(tokenizer, model, device, context, q_type):
     """Generate a question based on the context and type."""
     prompts = {
-        "factual": f"Context: {context}\n\nTask: Generate a factual question based on the text above.",
-        "comparative": f"Context: {context}\n\nTask: Generate a comparative question (comparing two things mentioned) based on the text above.",
-        "inferential": f"Context: {context}\n\nTask: Generate an inferential question (requires reasoning) based on the text above.",
-        "multi-hop": f"Context: {context}\n\nTask: Generate a complex multi-hop question based on the text above."
+        "factual": f"Context: {context}\n\nTask: Generate a clear, direct, and factual question that can be answered using ONLY the text above. Do not hallucinate information not present.\nQuestion:",
+        "comparative": f"Context: {context}\n\nTask: Generate a single question that asks to compare two distinct entities, dates, or concepts explicitly mentioned in the text above. Ensure both subjects are in the context.\nQuestion:",
+        "inferential": f"Context: {context}\n\nTask: Generate a question that requires logical reasoning or connecting two pieces of information from the text to answer. The answer must still be derived from the context.\nQuestion:",
+        "multi-hop": f"Context: {context}\n\nTask: Generate a complex question that requires synthesizing information from multiple sentences within the context. Avoid 'yes/no' questions.\nQuestion:"
     }
     
     prompt = prompts.get(q_type, prompts["factual"])
@@ -50,25 +50,23 @@ def generate_question(tokenizer, model, device, context, q_type):
     outputs = model.generate(
         **inputs, 
         max_new_tokens=64,
-        do_sample=True,
-        temperature=0.7,
-        top_p=0.9
+        do_sample=False,
+        repetition_penalty=1.2
     )
     
     return tokenizer.decode(outputs[0], skip_special_tokens=True).strip()
 
 def generate_answer(tokenizer, model, device, context, question):
     """Generate an answer based on the context and question."""
-    prompt = f"Context: {context}\n\nQuestion: {question}\n\nTask: Answer the question based on the context above."
+    prompt = f"Context: {context}\n\nQuestion: {question}\n\nTask: Answer the question concisely using ONLY the provided context. If the answer is not in the context, say 'NOT_FOUND'. Do not mention 'based on the text'.\nAnswer:"
     
     inputs = tokenizer(prompt, return_tensors="pt", truncation=True, max_length=1024).to(device)
     
     outputs = model.generate(
         **inputs, 
         max_new_tokens=128,
-        do_sample=True,
-        temperature=0.7,
-        top_p=0.9
+        do_sample=False,
+        repetition_penalty=1.2
     )
     
     return tokenizer.decode(outputs[0], skip_special_tokens=True).strip()

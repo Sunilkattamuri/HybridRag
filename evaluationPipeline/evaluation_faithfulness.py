@@ -15,7 +15,7 @@ def get_nli_model():
         # 'cross-encoder/nli-MiniLM2-L6-H768' is fast and good for this
         model_name = 'cross-encoder/nli-MiniLM2-L6-H768'
         print(f"Loading Faithfulness Model: {model_name}")
-        _nli_model = CrossEncoder(model_name)
+        _nli_model = CrossEncoder(model_name, max_length=512)
     return _nli_model
 
 def calculate_faithfulness(context, answer):
@@ -36,36 +36,27 @@ def calculate_faithfulness(context, answer):
         
     entailed_count = 0
     
-    # Prepare pairs: (Context, Sentence)
-    # Note: CrossEncoders take a list of pairs
-    pairs = [(context, sent) for sent in sentences]
-    
     # Predict returns scores for classes. 
-    # For nli-MiniLM2-L6-H768, labels are commonly: 0: Contradiction, 1: Entailment, 2: Neutral (or similar mapping)
-    # Actually, verify mapping for 'cross-encoder/nli-MiniLM2-L6-H768'
-    # According to HuggingFace: label2id: {'contradiction': 0, 'entailment': 1, 'neutral': 2} 
-    # WAIT: Usually it's Contradiction(0), Entailment(1), Neutral(2) OR Entailment(0), Neutral(1), Contradiction(2)?
-    # Let's check typical usage. 
-    # 'cross-encoder/nli-deberta-base' output is (Contradiction, Entailment, Neutral).
-    # 'cross-encoder/nli-MiniLM2-L6-H768' output is just logits.
-    # The safest way is to check the max score index.
-    # Standard MNLI mapping: 0=Contradiction, 1=Entailment, 2=Neutral usually.
-    # Actually, for `cross-encoder/stsb...` it gives similarity. 
-    # Let's use `cross-encoder/nli-distilroberta-base`. Labels: 0-contradiction, 1-entailment, 2-neutral.
+    # Label mapping: 0: Contradiction, 1: Entailment, 2: Neutral
     
-    # Let's assume index 1 is Entailment.
-    scores = model.predict(pairs)
-    
-    # scores is a list of arrays (logits)
-    # We want argmax. If argmax == 1 (Entailment), we count it.
-    
-    for score in scores:
-        label_idx = score.argmax()
-        # Mapping for nli-distilroberta-base and similar:
-        # 0: contradiction
-        # 1: entailment
-        # 2: neutral
+    for sent in sentences:
+        # 1. Exact Substring Match (Extractive QA is faithful by definition)
+        if sent in context:
+            entailed_count += 1
+            print(f"Faithfulness: Substring match for '{sent[:30]}...'")
+            continue
+            
+        # 2. NLI Model Check
+        pair = (context, sent)
+        scores = model.predict([pair], show_progress_bar=False)[0]
+        label_idx = scores.argmax()
+        
+        # Consider Entailment (1) as faithful. 
+        # Some strict models might classify 'paraphrase' as Neutral (2).
+        # We can optionally allow Neutral if Semantic Score is high, but strictly:
         if label_idx == 1: 
             entailed_count += 1
-            
+        else:
+             print(f"Faithfulness: Failed ({label_idx}) for '{sent[:30]}...'")
+
     return entailed_count / len(sentences)
