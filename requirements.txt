@@ -1,0 +1,13 @@
+streamlit
+transformers
+torch
+sentence-transformers
+chromadb
+rank_bm25
+matplotlib
+tqdm
+xhtml2pdf
+nltk
+beautifulsoup4
+requests
+numpy

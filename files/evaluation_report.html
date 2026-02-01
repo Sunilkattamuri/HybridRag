@@ -1,0 +1,62 @@
+
+    <html>
+    <head>
+        <style>
+            body { font-family: Arial, sans-serif; }
+            h1 { color: #2E86C1; }
+            h2 { color: #2874A6; border-bottom: 2px solid #2874A6; }
+            table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+            th { background-color: #f2f2f2; }
+            .metric-box { background: #f9f9f9; padding: 15px; border-radius: 5px; margin-bottom: 20px; }
+            img { max-width: 100%; height: auto; margin: 20px 0; }
+        </style>
+    </head>
+    <body>
+        <h1>HybridRAG Evaluation Report</h1>
+        <p>Generated automatically by the Evaluation Pipeline.</p>
+        
+        <div class="metric-box">
+            <h2>Executive Summary</h2>
+            <table style="width:50%">
+                <tr><th>Metric</th><th>Score</th></tr>
+                <tr><td>Average MRR (Hybrid)</td><td>0.2924</td></tr>
+                <tr><td>Average Semantic Similarity</td><td>0.0876</td></tr>
+                <tr><td>Average BLEU Score</td><td>0.0000</td></tr>
+                <tr><td>Average Faithfulness (NLI)</td><td>0.0000</td></tr>
+                <tr><td>Average LLM Judge Score (1-5)</td><td>2.74</td></tr>
+                <tr><td>Average Response Time</td><td>3.36 s</td></tr>
+            </table>
+        </div>
+        
+        <h2>Visualizations</h2>
+        
+        <h3>Metric Distributions</h3>
+        <img src="C:\Users\ksuni\Sunil\Personal\MTech-BITS\ImpAssignments\HybridRag-Final\files\plots\semantic_distribution.png">
+        
+        <h3>Faithfulness Distribution</h3>
+        <img src="C:\Users\ksuni\Sunil\Personal\MTech-BITS\ImpAssignments\HybridRag-Final\files\plots\faithfulness_distribution.png">
+        
+        <h3>Response Time</h3>
+        <img src="C:\Users\ksuni\Sunil\Personal\MTech-BITS\ImpAssignments\HybridRag-Final\files\plots\latency_distribution.png">
+        
+        <h3>Retrieval Ablation</h3>
+        <img src="C:\Users\ksuni\Sunil\Personal\MTech-BITS\ImpAssignments\HybridRag-Final\files\plots\ablation_comparison.png">
+        
+        
+        <h3>Ablation Study Results</h3>
+        <table border="1" cellpadding="5" cellspacing="0">
+            <tr><th>Method</th><th>MRR</th><th>Hit Rate</th></tr>
+            <tr><td>Dense</td><td>0.2850</td><td>0.3500</td></tr><tr><td>Sparse</td><td>0.1220</td><td>0.2800</td></tr><tr><td>Hybrid</td><td>0.2924</td><td>0.4000</td></tr>
+        </table>
+        
+        
+        <h2>Error Analysis (Bottom 5 Semantic Scores)</h2>
+        <table border="1">
+            <tr><th>ID</th><th>Question</th><th>Semantic Score</th><th>Issue</th></tr>
+            <tr><td>23</td><td>Was Romania less financially active by 1998/199 as Portugal was the fourth riches nation as listed as #1 in this category on Global Competitive Index. [[Cs3dod8A.1=(2b.3&hiD4ip9styIxyY</td><td>-0.0719</td><td>Low Similarity</td></tr><tr><td>72</td><td>How must people connect devices operating services on Oracle Compnant with Amazon servers to Oracle Opensystem deployment servers while building the desktop environments.? I was given two Linux Linux systems closfonasyanja2 for Oracle QFS. It required these environments that include which opensource container and Oracle Had</td><td>-0.0694</td><td>Low Similarity</td></tr><tr><td>92</td><td>Before being introduced along Route 81 the IPA and SMBs, would people choose other locations they did because both uses worked very badly or they would pay little with regard these things or have it worked perfectly every first reerg and on future missions to different geographic continenta on line 22. what about</td><td>-0.0563</td><td>Low Similarity</td></tr><tr><td>53</td><td>When took place Bhandranjagtakathandyunin 1994 release(first article title published only 5 hours ago (25 Nov 1995 in Times Books by Anelaih Safaru) in "Nal tishaysh, Nachhethans yun, Ja</td><td>-0.0374</td><td>Low Similarity</td></tr><tr><td>100</td><td>The "Thiruvelkulatraanainva" refer</td><td>-0.0371</td><td>Low Similarity</td></tr>
+        </table>
+        
+    </body>
+    </html>
+    
