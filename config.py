@@ -13,8 +13,8 @@ LLM_RAG_MODEL_NAME = "google/flan-t5-base"
 
 
 # Text Chunking Configuration
-CHUNK_SIZE = 500
-CHUNK_OVERLAP = 50
+CHUNK_SIZE = 200
+CHUNK_OVERLAP = 20
 MAX_NEW_TOKENS_LONG = 512
 
 # Data Processing Configuration
@@ -36,7 +36,7 @@ BM25_B = 0.75
 BM25_EPSILON = 0.25
 
 # Retrieval Configuration
-TOP_K_RESULTS = 5
+TOP_K_RESULTS = 10
 SIMILARITY_THRESHOLD = 0.5
 
 # API Request Configuration

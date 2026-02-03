@@ -32,7 +32,7 @@ def run_ingestion():
 
 # Trigger ingestion on start
 # Trigger ingestion on start
-# run_ingestion()
+#run_ingestion()
 
 # Sidebar options
 with st.sidebar:
@@ -43,7 +43,7 @@ with st.sidebar:
 # Main Search Interface
 # For testing, we allow UI to show even if ingestion isn't strictly "done" in this session,
 # assuming data persists in ChromaDB.
-if True: # st.session_state.get("ingestion_done"):
+if  True : #st.session_state.get("ingestion_done")
     st.divider()
     
     query = st.text_area("Enter your query:", height=100)

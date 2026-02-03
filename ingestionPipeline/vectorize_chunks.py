@@ -28,7 +28,7 @@ def vectorize_data():
                                                         embedding_function = embedding_function,
                                                         metadata={"hnsw:space": "cosine"})
     ids = [item['chunk_id'] for item in corpus_data]
-    documents = [item['content'] for item in corpus_data]
+    documents = [f"{item['title']} {item['content']}" for item in corpus_data]
     metadatas = [{"title": item['title'], "url": item['url'],
                   "chunk_index": item['metadata']['chunk_index']} for item in corpus_data]
     

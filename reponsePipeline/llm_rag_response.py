@@ -82,15 +82,20 @@ import numpy as np
 
 def llm_rag_response(context, query, max_length=config.MAX_NEW_TOKENS_LONG, return_metadata=False):
 
-     prompt = f"""Question: {query}
+     # Optimized prompt for Flan-T5 (Instruction -> Context -> Question)
+     prompt = f"""Using the context below, answer the following question. 
+If the answer is not in the context, YOU MUST RESPOND with "NOT_FOUND_IN_CONTEXT".
+Do not make up an answer.
 
 Context:
 {context}
 
-Answer the question based ONLY on the context above. If the answer cannot be found, say "NOT_FOUND_IN_CONTEXT"."""
-     
+Question: {query}
+
+Answer:"""
+      
      # encdoing the given prompt which has context and query
-     inputs = tokenizer(prompt, return_tensors="pt", truncation=True, max_length=1024)
+     inputs = tokenizer(prompt, return_tensors="pt", truncation=True, max_length=2048)
 
      # Move inputs to the same device as the model
      inputs = {key: value.to(model.device) for key, value in inputs.items()}

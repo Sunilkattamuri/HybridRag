@@ -37,35 +37,63 @@ def fetch_text_title(title):
     try:
         url = config.WIKIPEDIA_API_URL
         
-        #required params to fetch text as json
+        # 1. Fetch Infobox (using action=parse for HTML)
+        infobox_text = ""
+        try:
+            parse_params = {
+                "action": "parse",
+                "page": title,
+                "prop": "text",
+                "format": "json"
+            }
+            response = requests.get(url, headers=HEADERS, params=parse_params)
+            data = response.json()
+            if 'parse' in data and 'text' in data['parse']:
+                raw_html = data['parse']['text']['*']
+                soup = BeautifulSoup(raw_html, 'html.parser')
+                infobox = soup.find('table', {'class': 'infobox'})
+                if infobox:
+                    extracted_data = []
+                    for tr in infobox.find_all('tr'):
+                        th = tr.find('th')
+                        td = tr.find('td')
+                        if th and td:
+                            key = th.get_text(" ", strip=True)
+                            value = td.get_text(" ", strip=True)
+                            value = re.sub(r'\[\d+\]', '', value) # clean refs
+                            extracted_data.append(f"{key}: {value}")
+                    if extracted_data:
+                         infobox_text = "Infobox:\n" + "\n".join(extracted_data) + "\n\n"
+        except Exception as e:
+            utils.print_error(f"Error fetching infobox for {title}: {e}")
+
+        # 2. Fetch Content (using action=query for clean text)
         params = {
-         "action": "parse",
-         "page": title,
-         "prop": "text",
-         "format": "json"
+            "action": "query",
+            "format": "json",
+            "titles": title,
+            "prop": "extracts",
+            "explaintext": True,
         }
         
         # api call to fetch text
         response = requests.get(url, headers=HEADERS, params= params)
 
         #getting raw html from json response
-        raw_html = response.json()['parse']['text']['*']
-
-        # using beautiful soup to parse html and get text, beautiful soup handles html tags and entities
-        soup = BeautifulSoup(raw_html, 'html.parser')
-        text = soup.get_text()
+        data = response.json()
+        if 'error' in data:
+            utils.print_error(f"API Error: {data['error']}")
+            return ""
+            
+        page = next(iter(data['query']['pages'].values()))
+        text = page.get('extract', '')
 
         if not text:
             utils.print_error(f"No text found for title: {title}")
             return ""
         
-        # cleaning text by removing extra new lines and spaces
-        # Clean up references and excessive whitespace
-        text = re.sub(r'\[\d+\]', '', text)
-        # Remove multiple spaces and newlines
-        text = re.sub(r'\s+', ' ', text).strip()
-
-        return text
+        # Combine infobox and main text
+        return infobox_text + text
 
 
         
@@ -112,27 +140,33 @@ def prepareMetaData(title, url, chunks: list):
     return metadata_list
 
 
+def fetch_text_camelia():
+    text = fetch_text_title("Camellia_(cipher)")
+    print(text)
+
 if __name__ == "__main__":
     
-    dynamic_urls = utils.fetch_dynamic_urls_from_file()
-    
-    print(type(dynamic_urls))
-   # dynamic_urls = list(dynamic_urls.values())
-    print(len(dynamic_urls))
+    fetch_text_camelia()
 
-    for  title in (dynamic_urls):
-        idx = 0
-        print(f"{idx+1}. {title}")
-        text = fetch_text_title(title)
-        print(text)
-        if text is None or text.strip() == "":
-            continue
-        chunks = chunk_text(text)
-        print(chunks)
-        metadata = prepareMetaData(title, dynamic_urls[title], chunks)
-        print(metadata)
-        if idx >= 9:  # Just fetch first 10 for demo
-            break
+#     dynamic_urls = utils.fetch_dynamic_urls_from_file()
+    
+#     print(type(dynamic_urls))
+#    # dynamic_urls = list(dynamic_urls.values())
+#     print(len(dynamic_urls))
+
+#     for  title in (dynamic_urls):
+#         idx = 0
+#         print(f"{idx+1}. {title}")
+#         text = fetch_text_title(title)
+#         print(text)
+#         if text is None or text.strip() == "":
+#             continue
+#         chunks = chunk_text(text)
+#         print(chunks)
+#         metadata = prepareMetaData(title, dynamic_urls[title], chunks)
+#         print(metadata)
+#         if idx >= 9:  # Just fetch first 10 for demo
+#             break
 
 
 

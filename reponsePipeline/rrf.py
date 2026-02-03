@@ -54,8 +54,10 @@ def reciprocal_rank_fusion(dense_results, sparse_results, k=60, top_n=5):
 
 
 def fuse_responses(query, top_n=5):
-    dense_results = dense_response(query, top_n=top_n)
-    sparse_results = reponse_BM25(query, top_n=top_n)
+    # Fetch a larger pool of candidates for fusion
+    retrieval_limit = 60
+    dense_results = dense_response(query, top_n=retrieval_limit)
+    sparse_results = reponse_BM25(query, top_n=retrieval_limit)
     fused_results = reciprocal_rank_fusion(dense_results, sparse_results, k=60, top_n=top_n)
     return fused_results
 

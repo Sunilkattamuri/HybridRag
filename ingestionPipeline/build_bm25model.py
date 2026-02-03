@@ -14,7 +14,7 @@ def build_bm25_index():
     # fetch documents from metadata json file
     corpus_data = utils.fetch_metadata()
     # tokenize documents
-    tokenized_corpus = [word_tokenize(item['content'].lower()) for item in corpus_data]
+    tokenized_corpus = [word_tokenize(f"{item['title']} {item['content']}".lower()) for item in corpus_data]
     # build BM25 index
     bm25 = BM25Okapi(tokenized_corpus)
 

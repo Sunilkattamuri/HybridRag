@@ -27,6 +27,11 @@ def calculate_faithfulness(context, answer):
     if not context or not answer:
         return 0.0
         
+    # 1. Handle "NOT_FOUND" case
+    # If the system correctly identified that the answer is missing, it is faithful to the instruction.
+    if "NOT_FOUND_IN_CONTEXT" in answer:
+        return 1.0
+
     model = get_nli_model()
     
     # Split answer into sentences
@@ -34,29 +39,42 @@ def calculate_faithfulness(context, answer):
     if not sentences:
         return 0.0
         
+    # Split context into chunks (segments) to avoid 512 token limit of NLI model
+    # The RAG pipeline joins chunks with "\n\n", so we split by that.
+    context_chunks = context.split("\n\n")
+    
     entailed_count = 0
     
     # Predict returns scores for classes. 
     # Label mapping: 0: Contradiction, 1: Entailment, 2: Neutral
     
     for sent in sentences:
-        # 1. Exact Substring Match (Extractive QA is faithful by definition)
+        # Check if this sentence is supported by ANY of the context chunks
+        is_supported = False
+        
+        # Optimization: First check exact substring match in the full context
         if sent in context:
             entailed_count += 1
             print(f"Faithfulness: Substring match for '{sent[:30]}...'")
             continue
+
+        # NLI Check against each chunk
+        for chunk in context_chunks:
+            if not chunk.strip():
+                continue
+                
+            pair = (chunk, sent)
+            scores = model.predict([pair], show_progress_bar=False)[0]
+            label_idx = scores.argmax()
             
-        # 2. NLI Model Check
-        pair = (context, sent)
-        scores = model.predict([pair], show_progress_bar=False)[0]
-        label_idx = scores.argmax()
+            # If ANY chunk entails the sentence (Label 1), it's valid.
+            if label_idx == 1:
+                is_supported = True
+                break
         
-        # Consider Entailment (1) as faithful. 
-        # Some strict models might classify 'paraphrase' as Neutral (2).
-        # We can optionally allow Neutral if Semantic Score is high, but strictly:
-        if label_idx == 1: 
+        if is_supported:
             entailed_count += 1
         else:
-             print(f"Faithfulness: Failed ({label_idx}) for '{sent[:30]}...'")
+             print(f"Faithfulness: Failed to find entailment for '{sent[:30]}...'")
 
     return entailed_count / len(sentences)
