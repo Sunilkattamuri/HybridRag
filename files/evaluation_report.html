@@ -20,12 +20,12 @@
             <h2>Executive Summary</h2>
             <table style="width:50%">
                 <tr><th>Metric</th><th>Score</th></tr>
-                <tr><td>Average MRR (Hybrid)</td><td>0.6831</td></tr>
-                <tr><td>Average Semantic Similarity</td><td>0.4035</td></tr>
-                <tr><td>Average BLEU Score</td><td>0.0932</td></tr>
-                <tr><td>Average Faithfulness (NLI)</td><td>0.7550</td></tr>
-                <tr><td>Average LLM Judge Score (1-5)</td><td>2.99</td></tr>
-                <tr><td>Average Response Time</td><td>0.98 s</td></tr>
+                <tr><td>Average MRR (Hybrid)</td><td>0.8382</td></tr>
+                <tr><td>Average Semantic Similarity</td><td>0.5083</td></tr>
+                <tr><td>Average BLEU Score</td><td>0.1209</td></tr>
+                <tr><td>Average Faithfulness (NLI)</td><td>0.6800</td></tr>
+                <tr><td>Average LLM Judge Score (1-5)</td><td>2.88</td></tr>
+                <tr><td>Average Response Time</td><td>1.85 s</td></tr>
             </table>
         </div>
         
@@ -47,14 +47,14 @@
         <h3>Ablation Study Results</h3>
         <table border="1" cellpadding="5" cellspacing="0">
             <tr><th>Method</th><th>MRR</th><th>Hit Rate</th></tr>
-            <tr><td>Dense</td><td>0.6059</td><td>0.7200</td></tr><tr><td>Sparse</td><td>0.6670</td><td>0.8000</td></tr><tr><td>Hybrid</td><td>0.6831</td><td>0.8300</td></tr>
+            <tr><td>Dense</td><td>0.7094</td><td>0.8300</td></tr><tr><td>Sparse</td><td>0.7666</td><td>0.8500</td></tr><tr><td>Hybrid</td><td>0.8382</td><td>0.9000</td></tr>
         </table>
         
         
         <h2>Error Analysis (Bottom 5 Semantic Scores)</h2>
         <table border="1">
             <tr><th>ID</th><th>Question</th><th>Semantic Score</th><th>Issue</th></tr>
-            <tr><td>77</td><td>What is the most common way to modify a CDS protocol?</td><td>-0.0837</td><td>Low Similarity</td></tr><tr><td>78</td><td>What is the term for a system that has been certified by an external security-auditing organization?</td><td>-0.0269</td><td>Low Similarity</td></tr><tr><td>65</td><td>What are the two systems that are interrelated?</td><td>-0.0148</td><td>Low Similarity</td></tr><tr><td>69</td><td>What is the private key used for?</td><td>-0.0115</td><td>Low Similarity</td></tr><tr><td>38</td><td>What is the difference between the two GFs?</td><td>-0.0097</td><td>Low Similarity</td></tr>
+            <tr><td>52</td><td>What is the name of the Byzantine agreement protocol?</td><td>-0.0234</td><td>Low Similarity</td></tr><tr><td>57</td><td>What is the most likely reason that an eavesdropper will not learn the exchanged key?</td><td>-0.0030</td><td>Low Similarity</td></tr><tr><td>43</td><td>What is the difference between the two words?</td><td>-0.0022</td><td>Low Similarity</td></tr><tr><td>2</td><td>What is the name of the conference that Bill Gates and Craig Mundie attended?</td><td>0.0114</td><td>Low Similarity</td></tr><tr><td>37</td><td>What was the name of the agreement that was signed by the United States and Britain?</td><td>0.0279</td><td>Low Similarity</td></tr>
         </table>
         
     </body>

@@ -11,6 +11,17 @@ except ImportError:
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import config
 from collections import defaultdict
+from sentence_transformers import CrossEncoder
+
+# Global re-ranker model (lazy load)
+_reranker = None
+
+def get_reranker():
+    global _reranker
+    if _reranker is None:
+        print(f"Loading Re-ranker: {config.RERANK_MODEL}")
+        _reranker = CrossEncoder(config.RERANK_MODEL, max_length=512)
+    return _reranker
 
 
 def reciprocal_rank_fusion(dense_results, sparse_results, k=60, top_n=5):
@@ -53,13 +64,70 @@ def reciprocal_rank_fusion(dense_results, sparse_results, k=60, top_n=5):
     return sorted_results[:top_n]
 
 
+def rerank_results(query, fused_results, top_n=5):
+    """
+    Re-ranks the top results from RRF using a Cross-Encoder.
+    fused_results is a list of (chunk_id, rrf_score)
+    """
+    if not fused_results:
+        return []
+
+    # Get the text content for the candidates
+    # We need to fetch the content from ChromaDB to pass to the CrossEncoder
+    try:
+        from reponsePipeline.llm_rag_response import get_context_from_ids, get_chunk_details
+        
+        # Helper to fetch details efficiently
+        details = get_chunk_details(fused_results)
+        
+        # Prepare pairs for (Query, Document)
+        pairs = []
+        valid_details = []
+        
+        for item in details:
+            pairs.append([query, item['text']])
+            valid_details.append(item)
+            
+        if not pairs:
+            return fused_results[:top_n]
+            
+        # Predict scores
+        model = get_reranker()
+        scores = model.predict(pairs)
+        
+        # Attach new scores
+        reranked = []
+        for i, score in enumerate(scores):
+            reranked.append((valid_details[i]['id'], float(score)))
+            
+        # Sort by new Cross-Encoder score
+        reranked.sort(key=lambda x: x[1], reverse=True)
+        
+        return reranked[:top_n]
+        
+    except ImportError:
+        print("Could not import helpers for re-ranking. Skipping.")
+        return fused_results[:top_n]
+    except Exception as e:
+        print(f"Error during re-ranking: {e}")
+        return fused_results[:top_n]
+
+
 def fuse_responses(query, top_n=5):
-    # Fetch a larger pool of candidates for fusion
+    # Fetch a larger pool for RRF
     retrieval_limit = 60
     dense_results = dense_response(query, top_n=retrieval_limit)
     sparse_results = reponse_BM25(query, top_n=retrieval_limit)
-    fused_results = reciprocal_rank_fusion(dense_results, sparse_results, k=60, top_n=top_n)
-    return fused_results
+    
+    # 1. RRF Fusion (Stage 1) -> Get Top 20 Candidates
+    # We get more than top_n here to give the re-ranker some options
+    candidates_count = 20 
+    fused_results = reciprocal_rank_fusion(dense_results, sparse_results, k=60, top_n=candidates_count)
+    
+    # 2. Re-ranking (Stage 2) -> Get Top N
+    final_results = rerank_results(query, fused_results, top_n=top_n)
+    
+    return final_results
 
 if __name__ == "__main__":
     # Example usage

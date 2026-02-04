@@ -11,10 +11,14 @@ EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
 TOKENIZER_MODEL = "bert-base-uncased"
 LLM_RAG_MODEL_NAME = "google/flan-t5-base"
 
+# Re-ranking Configuration
+RERANK_MODEL = "cross-encoder/ms-marco-MiniLM-L-6-v2"
+
 
 # Text Chunking Configuration
-CHUNK_SIZE = 200
-CHUNK_OVERLAP = 20
+# Text Chunking Configuration
+CHUNK_SIZE = 500
+CHUNK_OVERLAP = 100
 MAX_NEW_TOKENS_LONG = 512
 
 # Data Processing Configuration
