@@ -115,13 +115,13 @@ def rerank_results(query, fused_results, top_n=5):
 
 def fuse_responses(query, top_n=5):
     # Fetch a larger pool for RRF
-    retrieval_limit = 60
+    retrieval_limit = 100
     dense_results = dense_response(query, top_n=retrieval_limit)
     sparse_results = reponse_BM25(query, top_n=retrieval_limit)
     
-    # 1. RRF Fusion (Stage 1) -> Get Top 20 Candidates
+    # 1. RRF Fusion (Stage 1) -> Get Top 50 Candidates
     # We get more than top_n here to give the re-ranker some options
-    candidates_count = 20 
+    candidates_count = 50 
     fused_results = reciprocal_rank_fusion(dense_results, sparse_results, k=60, top_n=candidates_count)
     
     # 2. Re-ranking (Stage 2) -> Get Top N

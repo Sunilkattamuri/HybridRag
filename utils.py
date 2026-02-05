@@ -10,36 +10,43 @@ class Colors:
 
 
 def fetch_fixed_urls():
-  
-    with open("files/fixed_urls.json", 'r') as f:
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    file_path = os.path.join(base_dir, "files", "fixed_urls.json")
+    with open(file_path, 'r') as f:
         fixed_urls = json.load(f)
     return fixed_urls
 
 def fetch_dynamic_urls_from_file():
-
-    if not os.path.exists("files/dynamic_urls.json"):
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    file_path = os.path.join(base_dir, "files", "dynamic_urls.json")
+    
+    if not os.path.exists(file_path):
         return []
 
-    with open("files/dynamic_urls.json", 'r') as f:
+    with open(file_path, 'r') as f:
         dynamic_urls = json.load(f)
     return (dynamic_urls)
 
 def delete_if_exists_dynamic_urls_file():
-
-    file_path = "files/dynamic_urls.json"
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    file_path = os.path.join(base_dir, "files", "dynamic_urls.json")
     if os.path.exists(file_path):
         os.remove(file_path)
         print(f"File '{file_path}' has been deleted.")
 
 
 def fetch_metadata():
-    with open("files/metadata.json", 'r') as f:
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    file_path = os.path.join(base_dir, "files", "metadata.json")
+    with open(file_path, 'r') as f:
         metadata = json.load(f)
     return metadata
 
 
 def fetch_qa_pairs():
-    with open("files/questionanswers.json", 'r') as f:
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    file_path = os.path.join(base_dir, "files", "questionanswers.json")
+    with open(file_path, 'r') as f:
         qa_pairs = json.load(f)
     return qa_pairs
 

@@ -23,7 +23,7 @@ def ingest_pipeline():
 
     # fetching dynamic and fixed urls combing all 
     
-    get_dynamic_urls(CONFIG.CATEGORIES, target=CONFIG.TARGET_DYNAMIC_URLS, min_words=CONFIG.MIN_WORDS)
+    # get_dynamic_urls(CONFIG.CATEGORIES, target=CONFIG.TARGET_DYNAMIC_URLS, min_words=CONFIG.MIN_WORDS)
 
     dynamic_urls = utils.fetch_dynamic_urls_from_file()
     fixed_urls = utils.fetch_fixed_urls()

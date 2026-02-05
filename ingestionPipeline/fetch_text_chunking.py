@@ -74,6 +74,7 @@ def fetch_text_title(title):
             "titles": title,
             "prop": "extracts",
             "explaintext": True,
+            "redirects": 1
         }
         
         # api call to fetch text

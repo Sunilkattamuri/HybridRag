@@ -7,12 +7,12 @@ WIKIPEDIA_API_URL = "https://en.wikipedia.org/w/api.php"
 USER_AGENT = "BIT-User-Agent/1.0 (academic research;)"
 
 # Model Configuration
-EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
+EMBEDDING_MODEL = "sentence-transformers/all-mpnet-base-v2"
 TOKENIZER_MODEL = "bert-base-uncased"
 LLM_RAG_MODEL_NAME = "google/flan-t5-base"
 
 # Re-ranking Configuration
-RERANK_MODEL = "cross-encoder/ms-marco-MiniLM-L-6-v2"
+RERANK_MODEL = "cross-encoder/ms-marco-MiniLM-L-12-v2"
 
 
 # Text Chunking Configuration
