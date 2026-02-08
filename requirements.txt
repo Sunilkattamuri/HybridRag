@@ -11,3 +11,4 @@ nltk
 beautifulsoup4
 requests
 numpy
+pinecone

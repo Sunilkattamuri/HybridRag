@@ -7,14 +7,12 @@ This project implements a **Hybrid Retrieval-Augmented Generation (RAG)** system
 ### Prerequisite
 Ensure you have Python installed and the dependencies from `requirements.txt` (if available) or install manually:
 ```bash
-pip install streamlit transformers torch sentence-transformers pinecone-client rank_bm25 matplotlib tqdm xhtml2pdf
+pip install streamlit transformers torch sentence-transformers pinecone-client pinecone rank_bm25 matplotlib tqdm xhtml2pdf
 ```
 
 ### Configuration
-This project uses **Pinecone** for vector storage. You must set your API key in `config.py`:
-1.  Sign up for a free account at [Pinecone](https://app.pinecone.io/).
-2.  Create an index named `hybrid-rag` (Dimension: 768, Metric: Cosine).
-3.  Add your API Key to `config.py` in the `PINECONE_API_KEY` variable.
+This project uses **Pinecone** for vector storage. 
+We have provided the api key in the config.py file so that you can use it directly.
 
 
 ### 1. Start the Search UI

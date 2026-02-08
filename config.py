@@ -26,7 +26,7 @@ MAX_RECORDS_LIMIT = 10
 BATCH_SIZE = 32
 
 # Vector Database Configuration
-PINECONE_API_KEY = "pcsk_2Esr7y_49UUndeEPqmXFyWG3CpRQXnd3Y2TAnKtia1GSDgKoEdqqS8P14AEs3aHL6uzFgo"
+PINECONE_API_KEY = 
 PINECONE_INDEX_NAME = "hybrid-rag"
 PINECONE_HOST = "https://hybrid-rag-md4312k.svc.aped-4627-b74a.pinecone.io" # Optional, can be derived or left out if not using host directly usually
 
