@@ -8,6 +8,57 @@ class Colors:
     BLUE = '\033[94m'
     RESET = '\033[0m'
 
+# Preprocessing resources (lazy load to avoid slow startup if not needed)
+_stemmer = None
+_stop_words = None
+
+def get_stemmer():
+    global _stemmer
+    if _stemmer is None:
+        from nltk.stem import PorterStemmer
+        _stemmer = PorterStemmer()
+    return _stemmer
+
+def get_stopwords():
+    global _stop_words
+    if _stop_words is None:
+        from nltk.corpus import stopwords
+        try:
+            _stop_words = set(stopwords.words('english'))
+        except LookupError:
+            import nltk
+            nltk.download('stopwords')
+            _stop_words = set(stopwords.words('english'))
+    return _stop_words
+
+def preprocess_text(text):
+    """
+    Tokenize, lowercase, remove stopwords, and stem.
+    Returns a list of tokens.
+    """
+    from nltk.tokenize import word_tokenize
+    
+    # standard tokenization
+    try:
+        tokens = word_tokenize(text.lower())
+    except LookupError:
+        import nltk
+        nltk.download('punkt')
+        tokens = word_tokenize(text.lower())
+        
+    stemmer = get_stemmer()
+    stops = get_stopwords()
+    
+    # Filter and stem
+    # Remove non-alphanumeric tokens and stopwords
+    processed = [
+        stemmer.stem(t) 
+        for t in tokens 
+        if t.isalnum() and t not in stops
+    ]
+    
+    return processed
+
 
 def fetch_fixed_urls():
     base_dir = os.path.dirname(os.path.abspath(__file__))

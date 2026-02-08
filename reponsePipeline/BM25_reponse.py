@@ -19,7 +19,7 @@ def reponse_BM25(query, top_n=5):
     corpus_data = utils.fetch_metadata()
 
     # Tokenize the query
-    tokenized_query = word_tokenize(query.lower())
+    tokenized_query = utils.preprocess_text(query)
 
     # Get BM25 scores
     scores = bm25.get_scores(tokenized_query)

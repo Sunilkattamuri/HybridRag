@@ -24,37 +24,42 @@ def get_reranker():
     return _reranker
 
 
-def reciprocal_rank_fusion(dense_results, sparse_results, k=60, top_n=5):
+def reciprocal_rank_fusion(dense_results, sparse_results, k=60, top_n=5, weights=None):
     """
     Perform Reciprocal Rank Fusion (RRF) on multiple ranked lists.
 
     Args:
         ranked_lists (list of list): A list containing multiple ranked lists of document IDs.
         k (int): The RRF parameter that controls the influence of lower-ranked documents.
+        weights (dict): Optional weights for 'dense' and 'sparse' lists.
 
     Returns:
         list: A single ranked list of document IDs after applying RRF.
     """
-
+    
+    if weights is None:
+        weights = {'dense': 1.0, 'sparse': 1.0}
 
     # Initialize dictionary to accumulate RRF scores
     rrf_scores = {}
     
     # Process dense retrieval results
     # Assign scores based on inverse rank (with RRF constant k)
+    w_dense = weights.get('dense', 1.0)
     for rank, (chunk_id, _) in enumerate(dense_results, start=1):
         if chunk_id not in rrf_scores:
             rrf_scores[chunk_id] = 0
         # Add RRF contribution: 1 / (k + rank)
         # Lower rank (earlier in list) contributes more
-        rrf_scores[chunk_id] += 1 / (k + rank)
+        rrf_scores[chunk_id] += w_dense * (1 / (k + rank))
     
     # Process sparse retrieval results
     # Documents appearing in both lists get additional score contributions
+    w_sparse = weights.get('sparse', 1.0)
     for rank, (chunk_id, _) in enumerate(sparse_results, start=1):
         if chunk_id not in rrf_scores:
             rrf_scores[chunk_id] = 0
-        rrf_scores[chunk_id] += 1 / (k + rank)
+        rrf_scores[chunk_id] += w_sparse * (1 / (k + rank))
     
     # Sort all documents by their combined RRF score (descending)
     # Higher score = better combined ranking
@@ -115,14 +120,24 @@ def rerank_results(query, fused_results, top_n=5):
 
 def fuse_responses(query, top_n=5):
     # Fetch a larger pool for RRF
-    retrieval_limit = 100
+    retrieval_limit = 500
     dense_results = dense_response(query, top_n=retrieval_limit)
     sparse_results = reponse_BM25(query, top_n=retrieval_limit)
     
-    # 1. RRF Fusion (Stage 1) -> Get Top 50 Candidates
+    # 1. RRF Fusion (Stage 1) -> Get Top 100 Candidates
     # We get more than top_n here to give the re-ranker some options
-    candidates_count = 50 
-    fused_results = reciprocal_rank_fusion(dense_results, sparse_results, k=60, top_n=candidates_count)
+    candidates_count = 100 
+    
+    # Use weights from config
+    rrf_weights = getattr(config, 'RRF_WEIGHTS', {'dense': 1.0, 'sparse': 1.0})
+    
+    fused_results = reciprocal_rank_fusion(
+        dense_results, 
+        sparse_results, 
+        k=60, 
+        top_n=candidates_count,
+        weights=rrf_weights
+    )
     
     # 2. Re-ranking (Stage 2) -> Get Top N
     final_results = rerank_results(query, fused_results, top_n=top_n)

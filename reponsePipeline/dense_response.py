@@ -1,33 +1,39 @@
-import chromadb
-import sys
 import os
+import sys
+from pinecone import Pinecone
+from sentence_transformers import SentenceTransformer
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import config
 
-def dense_response(query, top_n=5):
-    # Initialize ChromaDB client
-    client = chromadb.PersistentClient(path=config.CHROMA_DB_PATH)
+# Initialize model once to avoid reloading on every call if possible effectively
+# But for script usage, it will load each time. 
+model = SentenceTransformer(config.EMBEDDING_MODEL)
 
-    # Get the collection
-    collection = client.get_collection(name=config.COLLECTION_NAME)
+def dense_response(query, top_n=5):
+    # Initialize Pinecone client
+    pc = Pinecone(api_key=config.PINECONE_API_KEY)
+    index = pc.Index(config.PINECONE_INDEX_NAME)
+
+    # Generate embedding for the query
+    query_embedding = model.encode(query).tolist()
 
     # Perform the query
-    results = collection.query(
-        query_texts=[query],
-        n_results=top_n,
-        include=["metadatas", "distances", "documents"]
+    results = index.query(
+        vector=query_embedding,
+        top_k=top_n,
+        include_metadata=False, # We only need IDs and scores here usually, but keeping false for speed unless needed
+        include_values=False
     )
-
+    
     # Process and format results
     dense_hits = []
-    if results['ids'] and len(results['ids']) > 0:
-        for i in range(len(results['ids'][0])):
-            chunk_id = results['ids'][0][i]
-            # In ChromaDB with cosine space, distances are 1 - similarity
-            # So lower distance = higher similarity
-            score = results['distances'][0][i]
-            dense_hits.append((chunk_id, score))
+    
+    # Pinecone results structure: {'matches': [{'id': '...', 'score': 0.9, ...}]}
+    for match in results['matches']:
+        chunk_id = match['id']
+        score = match['score'] # Cosine similarity
+        dense_hits.append((chunk_id, score))
     
     return dense_hits
 

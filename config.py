@@ -17,8 +17,8 @@ RERANK_MODEL = "cross-encoder/ms-marco-MiniLM-L-12-v2"
 
 # Text Chunking Configuration
 # Text Chunking Configuration
-CHUNK_SIZE = 500
-CHUNK_OVERLAP = 100
+CHUNK_SIZE = 256
+CHUNK_OVERLAP = 50
 MAX_NEW_TOKENS_LONG = 512
 
 # Data Processing Configuration
@@ -26,8 +26,10 @@ MAX_RECORDS_LIMIT = 10
 BATCH_SIZE = 32
 
 # Vector Database Configuration
-CHROMA_DB_PATH = "./chroma_data"
-COLLECTION_NAME = "hybrid_rag_collection"
+PINECONE_API_KEY = "pcsk_2Esr7y_49UUndeEPqmXFyWG3CpRQXnd3Y2TAnKtia1GSDgKoEdqqS8P14AEs3aHL6uzFgo"
+PINECONE_INDEX_NAME = "hybrid-rag"
+PINECONE_HOST = "https://hybrid-rag-md4312k.svc.aped-4627-b74a.pinecone.io" # Optional, can be derived or left out if not using host directly usually
+
 
 # Paths
 DATA_FILES_PATH = "./files"
@@ -38,6 +40,10 @@ FIXED_URLS_FILE = "fixed_urls.json"
 BM25_K1 = 1.5
 BM25_B = 0.75
 BM25_EPSILON = 0.25
+RRF_WEIGHTS = {
+    'dense': 1.0,
+    'sparse': 3.0
+}
 
 # Retrieval Configuration
 TOP_K_RESULTS = 10
@@ -59,3 +65,6 @@ TARGET_DYNAMIC_URLS = 300
 MIN_WORDS = 200
 
 BM25_INDEX_PATH = "./bm25_index/bm25_index.pkl"
+
+# Evaluation Configuration
+FORCE_REGENERATE_QA = True

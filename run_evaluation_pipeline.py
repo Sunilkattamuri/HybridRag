@@ -10,6 +10,7 @@ from evaluationPipeline.ablation_study import run_ablation
 from evaluationPipeline.generate_plots import generate_visualizations
 from evaluationPipeline.generate_report import generate_report
 from evaluationPipeline.QA_generation import generate_qa_dataset
+import config as CONFIG
 
 def main():
     print("Starting HybridRAG Automated Evaluation Pipeline...")
@@ -18,7 +19,14 @@ def main():
     print(f"\n{'='*50}")
     print("STEP: Generating QA Dataset (Synthetic Data)")
     print(f"{'='*50}\n")
-    generate_qa_dataset()
+    print(f"{'='*50}\n")
+    
+    # Check if we should regenerate QA dataset
+    if getattr(CONFIG, 'FORCE_REGENERATE_QA', False) or not os.path.exists("files/questionanswers.json"):
+        generate_qa_dataset()
+    else:
+        print("Skipping QA generation (using existing 'files/questionanswers.json')...")
+        print("Set FORCE_REGENERATE_QA = True in config.py to force regeneration.")
     
     # 1. Calculate Metrics (Semantic, BLEU, Judge, Latency, Confidence)
     print(f"\n{'='*50}")

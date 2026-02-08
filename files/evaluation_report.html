@@ -20,12 +20,12 @@
             <h2>Executive Summary</h2>
             <table style="width:50%">
                 <tr><th>Metric</th><th>Score</th></tr>
-                <tr><td>Average MRR (Hybrid)</td><td>0.8342</td></tr>
-                <tr><td>Average Semantic Similarity</td><td>0.5398</td></tr>
-                <tr><td>Average BLEU Score</td><td>0.1770</td></tr>
-                <tr><td>Average Faithfulness (NLI)</td><td>0.6850</td></tr>
-                <tr><td>Average LLM Judge Score (1-5)</td><td>2.88</td></tr>
-                <tr><td>Average Response Time</td><td>1.81 s</td></tr>
+                <tr><td>Average MRR (Hybrid)</td><td>0.6653</td></tr>
+                <tr><td>Average Semantic Similarity</td><td>0.4095</td></tr>
+                <tr><td>Average BLEU Score</td><td>0.0851</td></tr>
+                <tr><td>Average Faithfulness (NLI)</td><td>0.8400</td></tr>
+                <tr><td>Average LLM Judge Score (1-5)</td><td>2.87</td></tr>
+                <tr><td>Average Response Time</td><td>1.09 s</td></tr>
             </table>
         </div>
         
@@ -47,14 +47,14 @@
         <h3>Ablation Study Results</h3>
         <table border="1" cellpadding="5" cellspacing="0">
             <tr><th>Method</th><th>MRR</th><th>Hit Rate</th></tr>
-            <tr><td>Dense</td><td>0.6953</td><td>0.7800</td></tr><tr><td>Sparse</td><td>0.8014</td><td>0.8800</td></tr><tr><td>Hybrid</td><td>0.8342</td><td>0.8800</td></tr>
+            <tr><td>Dense</td><td>0.4319</td><td>0.5900</td></tr><tr><td>Sparse</td><td>0.6059</td><td>0.6900</td></tr><tr><td>Hybrid</td><td>0.6653</td><td>0.7700</td></tr>
         </table>
         
         
         <h2>Error Analysis (Bottom 5 Semantic Scores)</h2>
         <table border="1">
             <tr><th>ID</th><th>Question</th><th>Semantic Score</th><th>Issue</th></tr>
-            <tr><td>61</td><td>What is the main idea of the passage?</td><td>-0.0527</td><td>Low Similarity</td></tr><tr><td>87</td><td>What is the difference between the two encryptions?</td><td>-0.0454</td><td>Low Similarity</td></tr><tr><td>29</td><td>What is the purpose of the EU's data protection regulations?</td><td>-0.0395</td><td>Low Similarity</td></tr><tr><td>90</td><td>What is the difference between the two codes?</td><td>-0.0256</td><td>Low Similarity</td></tr><tr><td>24</td><td>What is the difference between the two examples?</td><td>-0.0220</td><td>Low Similarity</td></tr>
+            <tr><td>24</td><td>What is the name of the public key that Alice and Bob have?</td><td>-0.0597</td><td>Low Similarity</td></tr><tr><td>49</td><td>What is the difference between the two methods?</td><td>-0.0537</td><td>Low Similarity</td></tr><tr><td>46</td><td>What is the difference between a displaystyle and a displaystyle?</td><td>-0.0475</td><td>Low Similarity</td></tr><tr><td>48</td><td>What is the difference between SoK: Secure Messaging and SoK: Secure Messaging?</td><td>-0.0449</td><td>Low Similarity</td></tr><tr><td>73</td><td>What is the most important security vulnerability that HSTS can fix?</td><td>-0.0390</td><td>Low Similarity</td></tr>
         </table>
         
     </body>

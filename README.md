@@ -7,8 +7,15 @@ This project implements a **Hybrid Retrieval-Augmented Generation (RAG)** system
 ### Prerequisite
 Ensure you have Python installed and the dependencies from `requirements.txt` (if available) or install manually:
 ```bash
-pip install streamlit transformers torch sentence-transformers chromadb rank_bm25 matplotlib tqdm xhtml2pdf
+pip install streamlit transformers torch sentence-transformers pinecone-client rank_bm25 matplotlib tqdm xhtml2pdf
 ```
+
+### Configuration
+This project uses **Pinecone** for vector storage. You must set your API key in `config.py`:
+1.  Sign up for a free account at [Pinecone](https://app.pinecone.io/).
+2.  Create an index named `hybrid-rag` (Dimension: 768, Metric: Cosine).
+3.  Add your API Key to `config.py` in the `PINECONE_API_KEY` variable.
+
 
 ### 1. Start the Search UI
 To launch the interactive Streamlit application:
@@ -52,9 +59,9 @@ The system follows a modular architecture designed for high precision and robust
 *   **Function**:
     *   Fetches content from URLs.
     *   Splits text into manageable chunks.
-    *   **Vectorization**: Generates embeddings using `sentence-transformers/all-MiniLM-L6-v2` and stores them in **ChromaDB**.
+    *   **Vectorization**: Generates embeddings using `sentence-transformers/all-mpnet-base-v2` and stores them in **Pinecone**.
     *   **Indexing**: Builds a BM25 index for keyword search and saves it as a pickle file.
-*   **Data output**: `files/chroma_db`, `files/bm25_model.pkl`, `files/metadata.json`.
+*   **Data output**: `files/bm25_model.pkl`, `files/metadata.json`. Pinecone index is hosted in the cloud.
 
 ![Ingestion Architecture](files/images/ingestion_architecture.png)
 
@@ -92,5 +99,5 @@ All persistent data is stored in the `files/` directory:
 *   `questionanswers.json`: Generated Q&A dataset with evaluation results.
 *   `evaluation_report.pdf`: Final generated report.
 *   `plots/`: Visualization images (PNG).
-*   `chroma_db/`: Vector database files.
 *   `bm25_model.pkl`: Sparse index file.
+

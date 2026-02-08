@@ -1,5 +1,7 @@
 import re
-import chromadb
+import re
+from pinecone import Pinecone
+
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 import torch
 import sys
@@ -17,7 +19,7 @@ model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
 
 def get_context_from_ids(fused_results):
     """
-    Retrieves the actual text content for the given chunk IDs from ChromaDB.
+    Retrieves the actual text content for the given chunk IDs from Pinecone.
     """
     # Extract just the chunk IDs from the RRF results (which are tuples of (id, score))
     chunk_ids = [result[0] for result in fused_results]
@@ -25,21 +27,21 @@ def get_context_from_ids(fused_results):
     if not chunk_ids:
         return ""
     
-    # Initialize ChromaDB client
-    client = chromadb.PersistentClient(path=config.CHROMA_DB_PATH)
-    collection = client.get_collection(name=config.COLLECTION_NAME)
+    # Initialize Pinecone client
+    pc = Pinecone(api_key=config.PINECONE_API_KEY)
+    index = pc.Index(config.PINECONE_INDEX_NAME)
     
-    # Query the collection for these IDs
-    results = collection.get(ids=chunk_ids)
-    
-    # Create a mapping from ID to document text
-    id_to_text = {id_: doc for id_, doc in zip(results['ids'], results['documents'])}
+    # Fetch from Pinecone
+    response = index.fetch(ids=chunk_ids)
+    vectors = response.vectors
     
     # Construct the context string preserving the order from fused_results
     context_parts = []
     for chunk_id in chunk_ids:
-        if chunk_id in id_to_text:
-            context_parts.append(id_to_text[chunk_id])
+        if chunk_id in vectors:
+            # We stored text in metadata
+            text = vectors[chunk_id].metadata.get('text', '')
+            context_parts.append(text)
     
     return "\n\n".join(context_parts)
 
@@ -54,23 +56,24 @@ def get_chunk_details(fused_results):
     if not chunk_ids:
         return []
     
-    client = chromadb.PersistentClient(path=config.CHROMA_DB_PATH)
-    collection = client.get_collection(name=config.COLLECTION_NAME)
+    pc = Pinecone(api_key=config.PINECONE_API_KEY)
+    index = pc.Index(config.PINECONE_INDEX_NAME)
     
-    results = collection.get(ids=chunk_ids)
+    response = index.fetch(ids=chunk_ids)
+    vectors = response.vectors
     
     details = []
     
-    # Create mappings for easy access
-    id_to_doc = {id_: doc for id_, doc in zip(results['ids'], results['documents'])}
-    id_to_meta = {id_: meta for id_, meta in zip(results['ids'], results['metadatas'])}
-    
     for chunk_id in chunk_ids:
-        if chunk_id in id_to_doc:
+        if chunk_id in vectors:
+            vector_data = vectors[chunk_id]
+            metadata = vector_data.metadata
+            text = metadata.get('text', '')
+            
             detail = {
                 "id": chunk_id,
-                "text": id_to_doc[chunk_id],
-                "metadata": id_to_meta.get(chunk_id, {}),
+                "text": text,
+                "metadata": metadata,
                 "rrf_score": rrf_scores.get(chunk_id, 0.0)
             }
             details.append(detail)
@@ -83,14 +86,14 @@ import numpy as np
 def llm_rag_response(context, query, max_length=config.MAX_NEW_TOKENS_LONG, return_metadata=False):
 
      # Optimized prompt for Flan-T5 (Instruction -> Context -> Question)
-     prompt = f"""Using the context below, answer the following question. 
+     prompt = f"""Answer the following question using the context below.
 If the answer is not in the context, YOU MUST RESPOND with "NOT_FOUND_IN_CONTEXT".
 Do not make up an answer.
 
+Question: {query}
+
 Context:
 {context}
-
-Question: {query}
 
 Answer:"""
       
